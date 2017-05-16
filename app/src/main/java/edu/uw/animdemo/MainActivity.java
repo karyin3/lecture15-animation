@@ -41,16 +41,24 @@ public class MainActivity extends AppCompatActivity {
     public boolean onTouchEvent(MotionEvent event) {
         //Log.v(TAG, event.toString());
 
+        int pointerIndex = MotionEventCompat.getActionIndex(event);
+        int uniquePointerID = MotionEventCompat.getPointerId(event, pointerIndex);
+        int pointerCount = MotionEventCompat.getPointerCount(event);
+
+
         boolean gesture = mDetector.onTouchEvent(event); //ask the detector to handle instead
         //if(gesture) return true; //if we don't also want to handle
 
-        float x = event.getX();
-        float y = event.getY() - getSupportActionBar().getHeight(); //closer to center...
+        float x = event.getX(pointerIndex);
+        float y = event.getY(pointerIndex) - getSupportActionBar().getHeight(); //closer to center...
+
 
         int action = MotionEventCompat.getActionMasked(event);
         switch(action) {
             case (MotionEvent.ACTION_DOWN) : //put finger down
-                //Log.v(TAG, "finger down");
+                Log.v(TAG, "first finger down");
+
+                view.addTouch(uniquePointerID, x, y);
 
                 ObjectAnimator xAnim = ObjectAnimator.ofFloat(view.ball, "x", x);
                 xAnim.setDuration(1000);
@@ -70,8 +78,30 @@ public class MainActivity extends AppCompatActivity {
                 //Log.v(TAG, "finger move");
 //                view.ball.cx = x;
 //                view.ball.cy = y;
+
+                for (int i = 0; i < pointerCount; i++) {
+                    uniquePointerID = MotionEventCompat.getPointerId(event, i);
+                    x = event.getX(i);
+                    y = event.getY(i) - getSupportActionBar().getHeight();
+                    view.moveTouch(uniquePointerID, x, y);
+                }
+
+                return true;
+            case (MotionEvent.ACTION_POINTER_DOWN):
+                Log.v(TAG, "another finger down");
+
+                view.addTouch(uniquePointerID, x, y);
+
+                return true;
+            case (MotionEvent.ACTION_POINTER_UP):
+                Log.v(TAG, "another finger up");
+                view.removeTouch(uniquePointerID);
                 return true;
             case (MotionEvent.ACTION_UP) : //lift finger up
+                Log.v(TAG, "last finger up");
+                view.removeTouch(uniquePointerID);
+                return true;
+
             case (MotionEvent.ACTION_CANCEL) : //aborted gesture
             case (MotionEvent.ACTION_OUTSIDE) : //outside bounds
             default :

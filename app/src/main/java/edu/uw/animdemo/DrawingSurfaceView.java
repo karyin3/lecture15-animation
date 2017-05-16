@@ -10,6 +10,9 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.util.Collection;
+import java.util.HashMap;
+
 /**
  * An example SurfaceView for generating graphics on
  * @author Joel Ross
@@ -31,6 +34,8 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
     private Paint goldPaint; //drawing variables (pre-defined for speed)
 
     public Ball ball; //public for easy access
+
+    public HashMap<Integer, Ball> touches;
 
 
     /**
@@ -60,6 +65,8 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
         whitePaint.setColor(Color.WHITE);
         goldPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         goldPaint.setColor(Color.rgb(145, 123, 76));
+
+        touches = new HashMap<Integer, Ball>();
 
         init();
     }
@@ -118,7 +125,14 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
 
         canvas.drawColor(Color.rgb(51,10,111)); //purple out the background
 
-        canvas.drawCircle(ball.cx, ball.cy, ball.radius, whitePaint); //we can draw directly onto the canvas
+        //canvas.drawCircle(ball.cx, ball.cy, ball.radius, whitePaint); //we can draw directly onto the canvas
+
+        Collection<Ball> ballList = touches.values();
+
+        for (Ball b : ballList) {
+            canvas.drawCircle(b.getX(), b.getY(), b.getRadius(), goldPaint);
+        }
+
     }
 
 
@@ -191,5 +205,22 @@ public class DrawingSurfaceView extends SurfaceView implements SurfaceHolder.Cal
                 }
             }
         }
+    }
+
+    public synchronized void addTouch(int pointerID, float x, float y) {
+        ball = new Ball(x , y, 50);
+
+        touches.put(pointerID, ball);
+    }
+
+    public synchronized void removeTouch(int pointerID) {
+        touches.remove(pointerID);
+    }
+
+    public synchronized void moveTouch(int pointerID, float x, float y){
+        Ball newBall = touches.get(pointerID);
+        newBall.setX(x);
+        newBall.setY(y);
+
     }
 }

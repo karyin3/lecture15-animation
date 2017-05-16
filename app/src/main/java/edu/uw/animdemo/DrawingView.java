@@ -26,6 +26,7 @@ public class DrawingView extends View {
 
     public Ball ball; //public for easy access
 
+
     /**
      * We need to override all the constructors, since we don't know which will be called
      * All the constructors eventually call init()
@@ -98,4 +99,6 @@ public class DrawingView extends View {
         canvas.drawBitmap(bmp, 0, 0, null); //and then draw the BitMap onto the canvas.
         //Canvas bmc = new Canvas(bmp); //we can also make a canvas out of a Bitmap to draw on that (like fetching g2d from a BufferedImage) if we don't want to double-buffer
     }
+
+
 }
